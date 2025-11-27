@@ -4,18 +4,22 @@ import streamlit as st
 
 
 def to_microseconds(value, unit):
+    if unit == "ns":
+        return value / 1000  # ns -> us
     if unit == "us":
         return value
     if unit == "ms":
         return value * 1000
     if unit == "s":
         return value * 1_000_000
-    raise ValueError("Unit must be 'us', 'ms', 's'")
+    raise ValueError("Unit must be 'ns', 'us', 'ms', 's'")
 
 # Convert from microseconds to the selected unit
 
 
 def from_microseconds(value_us, unit):
+    if unit == "ns":
+        return value_us * 1000  # us -> ns
     if unit == "us":
         return value_us
     if unit == "ms":
@@ -72,7 +76,7 @@ st.write("Calculează toate valorile posibile WDT pe MSP430 și recomandă combi
 
 # Input utilizator
 value = st.number_input("Timp dorit:", min_value=0.0, step=0.1)
-unit = st.selectbox("Unitate de timp:", ["us", "ms", "s"])
+unit = st.selectbox("Unitate de timp:", ["ns", "us", "ms", "s"])
 
 if st.button("Calculează"):
     desired_us = to_microseconds(value, unit)
