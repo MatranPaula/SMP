@@ -144,22 +144,23 @@ if st.button("Calculează"):
     best_time_converted = from_microseconds(best['time_us'], unit)
     best_error_converted = from_microseconds(best['error_us'], unit)
 
-    st.subheader("Recomandare optimă")
-    if best["Source"] == "ACLK":
-        st.success(
-            f"Source: ACLK\n"
-            f"Frequency: {best['Frequency']} Hz\n"
-            f"WDT_DIV: {best['Divider']}\n\n"
-            f"Timp generat: **{best_time_converted:.6f} {unit}**\n"
-            f"Eroare: **{best_error_converted:.6f} {unit}**"
-        )
-    else:
-        st.success(
-            f"Source: SMCLK\n"
-            f"DCO: {best['DCO']} Hz\n"
-            f"MCLK_DIV: {best['MCLK_DIV_CODE']} → MCLK = {best['MCLK']} Hz\n"
-            f"SMCLK_DIV: {best['SMCLK_DIV_CODE']} → SMCLK = {best['SMCLK']} Hz\n"
-            f"WDT_DIV: {best['WDT_DIV']}\n\n"
-            f"Timp generat: **{best_time_converted:.6f} {unit}**\n"
-            f"Eroare: **{best_error_converted:.6f} {unit}**"
-        )
+st.subheader("Recomandare optimă")
+if best["Source"] == "ACLK":
+    st.success(
+        f"Source: ACLK\n"
+        f"Frequency: {best['Frequency']} Hz\n"
+        f"WDT_DIV: {best['Divider']}\n"
+        f"Timp generat: {best_time_converted:.6f} {unit}\n"
+        f"Eroare: {best_error_converted:.6f} {unit}"
+    )
+else:
+    st.success(
+        f"Source: SMCLK\n"
+        f"DCO: {best['DCO']} Hz\n"
+        f"MCLK_DIV: {best['MCLK_DIV_CODE']} → MCLK = {best['MCLK']} Hz\n"
+        f"SMCLK_DIV: {best['SMCLK_DIV_CODE']} → SMCLK = {best['SMCLK']} Hz\n"
+        f"WDT_DIV: {best['WDT_DIV']}\n"
+        f"Timp generat: {best_time_converted:.6f} {unit}\n"
+        f"Eroare: {best_error_converted:.6f} {unit}"
+    )
+
