@@ -36,7 +36,7 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
     results = []
 
     # WDT dividers (2^6, 2^9, ..., 2^31)
-    wdt_dividers = {f"2^{i}": 2**i for i in [6,9,13,15,19,23,27,31]}
+    wdt_dividers = {f"2^{i}": 2**i for i in [6, 9, 13, 15, 19, 23, 27, 31]}
 
     # 1️⃣ First try ACLK (32768 Hz)
     ACLK = 32768
@@ -61,28 +61,11 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
                  12_000_000, 16_000_000, 20_000_000, 24_000_000]
 
     # MCLK/SMCLK prescalers
-    cs_dividers = {
-        "DIV1": 1,
-        "DIV2": 2,
-        "DIV4": 4,
-        "DIV8": 8
-    }
+    cs_dividers = {"DIV1": 1, "DIV2": 2, "DIV4": 4, "DIV8": 8}
 
     # Mapping for register names
-    divm_codes = {
-        1: "DIVM_0",
-        2: "DIVM_1",
-        4: "DIVM_2",
-        8: "DIVM_3",
-        16: "DIVM_4"
-    }
-    divs_codes = {
-        1: "DIVS_0",
-        2: "DIVS_1",
-        4: "DIVS_2",
-        8: "DIVS_3",
-        16: "DIVS_4"
-    }
+    divm_codes = {1: "DIVM_0", 2: "DIVM_1", 4: "DIVM_2", 8: "DIVM_3", 16: "DIVM_4"}
+    divs_codes = {1: "DIVS_0", 2: "DIVS_1", 4: "DIVS_2", 8: "DIVS_3", 16: "DIVS_4"}
 
     for dco in dco_freqs:
         for divm_name, divm in cs_dividers.items():  # MCLK divider
@@ -144,23 +127,24 @@ if st.button("Calculează"):
     best_time_converted = from_microseconds(best['time_us'], unit)
     best_error_converted = from_microseconds(best['error_us'], unit)
 
-st.subheader("Recomandare optimă")
-if best["Source"] == "ACLK":
-    st.success(
-        f"Source: ACLK\n"
-        f"Frequency: {best['Frequency']} Hz\n"
-        f"WDT_DIV: {best['Divider']}\n"
-        f"Timp generat: {best_time_converted:.6f} {unit}\n"
-        f"Eroare: {best_error_converted:.6f} {unit}"
-    )
-else:
-    st.success(
-        f"Source: SMCLK\n"
-        f"DCO: {best['DCO']} Hz\n"
-        f"MCLK_DIV: {best['MCLK_DIV_CODE']} → MCLK = {best['MCLK']} Hz\n"
-        f"SMCLK_DIV: {best['SMCLK_DIV_CODE']} → SMCLK = {best['SMCLK']} Hz\n"
-        f"WDT_DIV: {best['WDT_DIV']}\n"
-        f"Timp generat: {best_time_converted:.6f} {unit}\n"
-        f"Eroare: {best_error_converted:.6f} {unit}"
-    )
+    st.subheader("Recomandare optimă")
+    if best["Source"] == "ACLK":
+        st.success(
+            f"Source: ACLK\n"
+            f"Frequency: {best['Frequency']} Hz\n"
+            f"WDT_DIV: {best['Divider']}\n"
+            f"Timp generat: {best_time_converted:.6f} {unit}\n"
+            f"Eroare: {best_error_converted:.6f} {unit}"
+        )
+    else:
+        st.success(
+            f"Source: SMCLK\n"
+            f"DCO: {best['DCO']} Hz\n"
+            f"MCLK_DIV: {best['MCLK_DIV_CODE']} → MCLK = {best['MCLK']} Hz\n"
+            f"SMCLK_DIV: {best['SMCLK_DIV_CODE']} → SMCLK = {best['SMCLK']} Hz\n"
+            f"WDT_DIV: {best['WDT_DIV']}\n"
+            f"Timp generat: {best_time_converted:.6f} {unit}\n"
+            f"Eroare: {best_error_converted:.6f} {unit}"
+        )
+
 
