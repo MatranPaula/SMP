@@ -96,8 +96,8 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
 # ----------------------------
 # STREAMLIT UI
 # ----------------------------
-st.title("⏱ MSP430 Watchdog Timer Interval Calculator (ACLK first, then DCO/SMCLK/MCLK)")
-st.write("Mai întâi verifică ACLK fix la 32768 Hz, apoi trece la DCO/SMCLK/MCLK dacă nu găsește potrivire exactă. WDT folosește divizori 2^6 … 2^31.")
+st.title("⏱ MSP430 Watchdog Timer Interval Calculator")
+
 
 # User input
 value = st.number_input("Timp dorit:", min_value=0.0, step=0.1)
@@ -142,5 +142,6 @@ SMCLK_DIV: {best['SMCLK_DIV_CODE']} → SMCLK = {best['SMCLK']} Hz
 WDT_DIV: {best['WDT_DIV']}
 Timp generat: {best_time_converted:.6f} {unit}
 Eroare: {best_error_converted:.6f} {unit}""")
+
 
 
