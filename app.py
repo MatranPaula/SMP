@@ -30,14 +30,13 @@ def from_microseconds(value_us, unit):
 
 
 # ----------------------------
-# Compute all WDT intervals (DCO 1-24MHz, DIVM/DIVS 1,2,4,8)
+# Compute WDT intervals with fixed DCO = 16 or 24 MHz
 # ----------------------------
 def compute_wdt_intervals(desired_us):
-    # Simulate DCO frequencies (max 24 MHz)
-    dco_freqs = [1_000_000, 2_000_000, 4_000_000, 8_000_000,
-                 12_000_000, 16_000_000, 20_000_000, 24_000_000]
+    # Fixed DCO values
+    dco_freqs = [16_000_000, 24_000_000]  # doar 16 MHz sau 24 MHz
 
-    # DIVM/DIVS prescalers
+    # DIVM / DIVS prescalers
     cs_dividers = {
         "DIV1": 1,
         "DIV2": 2,
@@ -60,33 +59,35 @@ def compute_wdt_intervals(desired_us):
     results = []
 
     for dco in dco_freqs:
-        for divm_name, divm in cs_dividers.items():  # MCLK divider
+        for divm_name, divm in cs_dividers.items():
             mclk = dco / divm
-            for divs_name, divs in cs_dividers.items():  # SMCLK divider
+            for divs_name, divs in cs_dividers.items():
                 smclk = mclk / divs
-                for wdt_name, wdt_div in wdt_dividers.items():
-                    t_us = (wdt_div / smclk) * 1_000_000
-                    error = abs(t_us - desired_us)
-                    results.append({
-                        "DCO": dco,
-                        "MCLK_DIV": divm_name,
-                        "MCLK": mclk,
-                        "SMCLK_DIV": divs_name,
-                        "SMCLK": smclk,
-                        "WDT_DIV": wdt_name,
-                        "time_us": t_us,
-                        "error_us": error
-                    })
+                # validăm doar frecvențe intregi (sau cele permise de laborator)
+                if smclk > 0:
+                    for wdt_name, wdt_div in wdt_dividers.items():
+                        t_us = (wdt_div / smclk) * 1_000_000
+                        error = abs(t_us - desired_us)
+                        results.append({
+                            "DCO": dco,
+                            "MCLK_DIV": divm_name,
+                            "MCLK": mclk,
+                            "SMCLK_DIV": divs_name,
+                            "SMCLK": smclk,
+                            "WDT_DIV": wdt_name,
+                            "time_us": t_us,
+                            "error_us": error
+                        })
 
     best = min(results, key=lambda x: x["error_us"])
     return results, best
 
 
 # ----------------------------
-# STREAMLIT UI
+# Streamlit UI
 # ----------------------------
-st.title("⏱ MSP430 Watchdog Timer Interval Calculator (DCO 1-24MHz, DIVM/DIVS)")
-st.write("Calculează intervalele WDT folosind DCO până la 24 MHz și toate divizările valide.")
+st.title("⏱ MSP430 Watchdog Timer Interval Calculator (DCO 16/24 MHz)")
+st.write("Calculează intervalele WDT folosind DCO 16 sau 24 MHz și divizările valide.")
 
 # User input
 value = st.number_input("Timp dorit:", min_value=0.0, step=0.1)
@@ -123,4 +124,3 @@ if st.button("Calculează"):
         f"Timp generat: **{best_time_converted:.6f} {unit}**\n"
         f"Eroare: **{best_error_converted:.6f} {unit}**"
     )
-
