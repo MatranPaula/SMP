@@ -59,7 +59,30 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
     # 2️⃣ If not, continue with DCO / MCLK / SMCLK
     dco_freqs = [1_000_000, 2_000_000, 4_000_000, 8_000_000,
                  12_000_000, 16_000_000, 20_000_000, 24_000_000]
-    cs_dividers = {"DIV1": 1, "DIV2": 2, "DIV4": 4, "DIV8": 8}
+
+    # MCLK/SMCLK prescalers
+    cs_dividers = {
+        "DIV1": 1,
+        "DIV2": 2,
+        "DIV4": 4,
+        "DIV8": 8
+    }
+
+    # Mapping for register names
+    divm_codes = {
+        1: "DIVM_0",
+        2: "DIVM_1",
+        4: "DIVM_2",
+        8: "DIVM_3",
+        16: "DIVM_4"
+    }
+    divs_codes = {
+        1: "DIVS_0",
+        2: "DIVS_1",
+        4: "DIVS_2",
+        8: "DIVS_3",
+        16: "DIVS_4"
+    }
 
     for dco in dco_freqs:
         for divm_name, divm in cs_dividers.items():  # MCLK divider
@@ -72,9 +95,11 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
                     results.append({
                         "Source": "SMCLK",
                         "DCO": dco,
-                        "MCLK_DIV": divm_name,
+                        "MCLK_DIV": divm,
+                        "MCLK_DIV_CODE": divm_codes[divm],
                         "MCLK": mclk,
-                        "SMCLK_DIV": divs_name,
+                        "SMCLK_DIV": divs,
+                        "SMCLK_DIV_CODE": divs_codes[divs],
                         "SMCLK": smclk,
                         "WDT_DIV": wdt_name,
                         "time_us": t_us,
@@ -104,9 +129,9 @@ if st.button("Calculează"):
         {
             "Source": r.get("Source", ""),
             "DCO (Hz)": r.get("DCO", ""),
-            "MCLK_DIV": r.get("MCLK_DIV", ""),
+            "MCLK_DIV": r.get("MCLK_DIV_CODE", r.get("MCLK_DIV", "")),
             "MCLK (Hz)": r.get("MCLK", ""),
-            "SMCLK_DIV": r.get("SMCLK_DIV", ""),
+            "SMCLK_DIV": r.get("SMCLK_DIV_CODE", r.get("SMCLK_DIV", "")),
             "SMCLK (Hz)": r.get("SMCLK", ""),
             "Frequency (Hz)": r.get("Frequency", ""),
             "WDT_DIV": r.get("Divider", r.get("WDT_DIV", "")),
@@ -132,11 +157,9 @@ if st.button("Calculează"):
         st.success(
             f"Source: SMCLK\n"
             f"DCO: {best['DCO']} Hz\n"
-            f"MCLK_DIV: {best['MCLK_DIV']} → MCLK = {best['MCLK']} Hz\n"
-            f"SMCLK_DIV: {best['SMCLK_DIV']} → SMCLK = {best['SMCLK']} Hz\n"
+            f"MCLK_DIV: {best['MCLK_DIV_CODE']} → MCLK = {best['MCLK']} Hz\n"
+            f"SMCLK_DIV: {best['SMCLK_DIV_CODE']} → SMCLK = {best['SMCLK']} Hz\n"
             f"WDT_DIV: {best['WDT_DIV']}\n\n"
             f"Timp generat: **{best_time_converted:.6f} {unit}**\n"
             f"Eroare: **{best_error_converted:.6f} {unit}**"
         )
-
-
