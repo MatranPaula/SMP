@@ -73,6 +73,7 @@ def compute_wdt_intervals(desired_us):
                         "MCLK": mclk,
                         "SMCLK_DIV": divs_name,
                         "SMCLK": smclk,
+                        "ACLK": 32768,          # ACLK fix
                         "WDT_DIV": wdt_name,
                         "time_us": t_us,
                         "error_us": error
@@ -86,7 +87,7 @@ def compute_wdt_intervals(desired_us):
 # STREAMLIT UI
 # ----------------------------
 st.title("⏱ MSP430 Watchdog Timer Interval Calculator (DCO 1-24MHz, DIVM/DIVS)")
-st.write("Calculează intervalele WDT folosind DCO până la 24 MHz și toate divizările valide.")
+st.write("Calculează intervalele WDT folosind DCO până la 24 MHz și toate divizările valide. ACLK este fix la 32768 Hz.")
 
 # User input
 value = st.number_input("Timp dorit:", min_value=0.0, step=0.1)
@@ -104,6 +105,7 @@ if st.button("Calculează"):
             "MCLK (Hz)": r["MCLK"],
             "SMCLK_DIV": r["SMCLK_DIV"],
             "SMCLK (Hz)": r["SMCLK"],
+            "ACLK (Hz)": r["ACLK"],          # afișăm ACLK
             "WDT_DIV": r["WDT_DIV"],
             "Time (us)": round(r["time_us"], 3),
             "Error (us)": round(r["error_us"], 3)
@@ -119,8 +121,10 @@ if st.button("Calculează"):
         f"DCO: **{best['DCO']} Hz**\n"
         f"MCLK_DIV: **{best['MCLK_DIV']}** → MCLK = {best['MCLK']} Hz\n"
         f"SMCLK_DIV: **{best['SMCLK_DIV']}** → SMCLK = {best['SMCLK']} Hz\n"
+        f"ACLK: 32768 Hz\n"
         f"WDT_DIV: **{best['WDT_DIV']}**\n\n"
         f"Timp generat: **{best_time_converted:.6f} {unit}**\n"
         f"Eroare: **{best_error_converted:.6f} {unit}**"
     )
+
 
