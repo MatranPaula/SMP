@@ -35,16 +35,12 @@ def from_microseconds(value_us, unit):
 def compute_wdt_intervals(desired_us, tolerance=1.0):
     results = []
 
-    # 1️⃣ First try ACLK (fixed 32768 Hz) with standard WDT dividers
-    ACLK = 32768
-    aclk_wdt_dividers = {
-        "2^6": 2**6,
-        "2^8": 2**8,
-        "2^10": 2**10,
-        "2^12": 2**12
-    }
+    # WDT dividers (2^6, 2^9, ..., 2^31)
+    wdt_dividers = {f"2^{i}": 2**i for i in [6,9,13,15,19,23,27,31]}
 
-    for wdt_name, wdt_div in aclk_wdt_dividers.items():
+    # 1️⃣ First try ACLK (32768 Hz)
+    ACLK = 32768
+    for wdt_name, wdt_div in wdt_dividers.items():
         t_us = (wdt_div / ACLK) * 1_000_000
         error = abs(t_us - desired_us)
         results.append({
@@ -55,26 +51,15 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
             "error_us": error
         })
 
-    # If exact match within tolerance found, no need for DCO calculations
+    # Check if ACLK gives acceptable result
     best_aclk = min(results, key=lambda x: x["error_us"])
     if best_aclk["error_us"] <= tolerance:
         return results, best_aclk
 
     # 2️⃣ If not, continue with DCO / MCLK / SMCLK
-    # DCO frequencies (max 24 MHz)
     dco_freqs = [1_000_000, 2_000_000, 4_000_000, 8_000_000,
                  12_000_000, 16_000_000, 20_000_000, 24_000_000]
     cs_dividers = {"DIV1": 1, "DIV2": 2, "DIV4": 4, "DIV8": 8}
-    wdt_dividers = {
-        "2^6": 2**6,
-        "2^9": 2**9,
-        "2^13": 2**13,
-        "2^15": 2**15,
-        "2^19": 2**19,
-        "2^23": 2**23,
-        "2^27": 2**27,
-        "2^31": 2**31
-    }
 
     for dco in dco_freqs:
         for divm_name, divm in cs_dividers.items():  # MCLK divider
@@ -103,8 +88,8 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
 # ----------------------------
 # STREAMLIT UI
 # ----------------------------
-st.title("⏱ MSP430 Watchdog Timer Interval Calculator (ACLK first, then DCO)")
-st.write("Mai întâi verifică ACLK fix la 32768 Hz, apoi trece la DCO/SMCLK/MCLK dacă nu găsește potrivire exactă.")
+st.title("⏱ MSP430 Watchdog Timer Interval Calculator (ACLK first, then DCO/SMCLK/MCLK)")
+st.write("Mai întâi verifică ACLK fix la 32768 Hz, apoi trece la DCO/SMCLK/MCLK dacă nu găsește potrivire exactă. WDT folosește divizori 2^6 … 2^31.")
 
 # User input
 value = st.number_input("Timp dorit:", min_value=0.0, step=0.1)
@@ -153,7 +138,5 @@ if st.button("Calculează"):
             f"Timp generat: **{best_time_converted:.6f} {unit}**\n"
             f"Eroare: **{best_error_converted:.6f} {unit}**"
         )
-
-
 
 
