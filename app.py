@@ -38,7 +38,7 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
     # WDT dividers (2^6, 2^9, ..., 2^31)
     wdt_dividers = {f"2^{i}": 2**i for i in [6, 9, 13, 15, 19, 23, 27, 31]}
 
-    # 1️⃣ First try ACLK (32768 Hz)
+    #  First try ACLK (32768 Hz)
     ACLK = 32768
     for wdt_name, wdt_div in wdt_dividers.items():
         t_us = (wdt_div / ACLK) * 1_000_000
@@ -56,7 +56,7 @@ def compute_wdt_intervals(desired_us, tolerance=1.0):
     if best_aclk["error_us"] <= tolerance:
         return results, best_aclk
 
-    # 2️⃣ If not, continue with DCO / MCLK / SMCLK
+    #  If not, continue with DCO / MCLK / SMCLK
     dco_freqs = [1_000_000, 2_000_000, 4_000_000, 8_000_000,
                  12_000_000, 16_000_000, 20_000_000, 24_000_000]
 
@@ -142,6 +142,7 @@ SMCLK_DIV: {best['SMCLK_DIV_CODE']} → SMCLK = {best['SMCLK']} Hz
 WDT_DIV: {best['WDT_DIV']}
 Timp generat: {best_time_converted:.6f} {unit}
 Eroare: {best_error_converted:.6f} {unit}""")
+
 
 
 
